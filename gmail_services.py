@@ -46,6 +46,7 @@ class GmailService:
             self.service.users().messages().modify(userId='me', id=msg['id'], body={'removeLabelIds': ['UNREAD']}).execute()
         return output
 
+    
 if __name__ == "__main__":
     gmail_service = GmailService()
     print(gmail_service.get_new_emails(3))

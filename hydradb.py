@@ -58,8 +58,9 @@ def cosine_similarity(vec1, vec2):
 @mcp.tool()
 def hydradb_store_memory(memory_text: str, memory_type: str, tags: list[str] = []) -> str:
     """
-    [BẮT BUỘC] Dùng để học thêm kiến thức mới hoặc thói quen của user.
+    [BẮT BUỘC] gọi mỗi khi cần lưu vào bộ nhớ. Dùng để học thêm kiến thức mới hoặc thói quen của user.
     memory_type CHỈ ĐƯỢC CHỌN 1 trong 3: 'episodic', 'semantic', 'procedural'.
+    tất cả các biến đều phải ghi bằng tiếng Anh, bao gồm cả memory_text.
     """
     valid_types = ["episodic", "semantic", "procedural"]
     if memory_type not in valid_types:
@@ -92,7 +93,8 @@ def hydradb_store_memory(memory_text: str, memory_type: str, tags: list[str] = [
 @mcp.tool()
 def hydradb_retrieve_memory(query: str, top_k: int = 4) -> str:
     """
-    [BẮT BUỘC] Dùng công cụ này để dò tìm thông tin trong não TRƯỚC KHI ra quyết định.
+    [BẮT BUỘC] luôn luôn dùng trước khi trả lời user. 
+    Dùng công cụ này để dò tìm thông tin trong não TRƯỚC KHI ra quyết định.
     Trả về context để bạn phân tích.
     """
     data = load_db()

@@ -12,7 +12,7 @@ calendar_svc = CalendarService()
 def fetch_raw_emails(num_emails: int) -> str:
     """
     Công cụ này trích xuất nội dung các email chưa đọc mới nhất.
-    Hãy sử dụng công cụ này để lấy dữ liệu, sau đó BẠN (AI) tự phân tích và tóm tắt lại cho người dùng.
+    Hãy sử dụng công cụ này để lấy dữ liệu, sau đó phân tích và tóm tắt và trả lời những gì lấy được.
     Args:
         num_emails: Số lượng email tối đa cần lấy.
     """

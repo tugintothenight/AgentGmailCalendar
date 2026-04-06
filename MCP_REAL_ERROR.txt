@@ -1,5 +1,0 @@
-=== PYTHON ĐÃ KHỞI ĐỘNG VÀ ĐANG CHỜ OPENFANG ===
-[03/19/26 17:33:30] INFO     Processing request of type           server.py:720
-                             ListToolsRequest                                  
-[03/19/26 17:34:51] INFO     Processing request of type           server.py:720
-                             CallToolRequest                                   
