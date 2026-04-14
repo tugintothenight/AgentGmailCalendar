@@ -11,23 +11,23 @@ SCOPES = [
 def get_google_credentials():
     """Hàm này lấy và trả về thông tin xác thực của Google."""
     creds = None
-    if os.path.exists('D:/openfangAgentGS/auth/token.json'):
-        creds = Credentials.from_authorized_user_file('D:/openfangAgentGS/auth/token.json', SCOPES)
+    if os.path.exists('D:/ADOAN/auth/token.json'):
+        creds = Credentials.from_authorized_user_file('D:/ADOAN/auth/token.json', SCOPES)
     
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
             try:
-                if not os.path.exists('D:/openfangAgentGS/auth/credentials.json'):
+                if not os.path.exists('D:/ADOAN/auth/credentials.json'):
                     raise FileNotFoundError("credentials.json thiếu gòi")
             except FileNotFoundError as e:
                 return None
             # mở trình duyệt để cấp quyền
             flow = InstalledAppFlow.from_client_secrets_file(
-                'D:/openfangAgentGS/auth/credentials.json', SCOPES)
+                'D:/ADOAN/auth/credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
-        with open('D:/openfangAgentGS/auth/token.json', 'w') as token:
+        with open('D:/ADOAN/auth/token.json', 'w') as token:
             token.write(creds.to_json())
             
     return creds
