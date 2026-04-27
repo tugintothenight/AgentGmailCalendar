@@ -11956,36 +11956,6 @@
       "edge": "không thích",
       "target": "nho khô",
       "linked_memory_id": "mem_1776049407"
-    },
-    {
-      "source": "Sép",
-      "edge": "muốn",
-      "target": "em lập tậc lịch hế p mới thểy có liên quan đơn họp",
-      "linked_memory_id": "mem_1777025084"
-    },
-    {
-      "source": "em",
-      "edge": "lập tậc",
-      "target": "lịch hế p mới thểy có liên quan đơn họp",
-      "linked_memory_id": "mem_1777025084"
-    },
-    {
-      "source": "tu00f4i",
-      "edge": "su1ebd u1ee9 u0103n cu1ed1 cu01b0u1edbi",
-      "target": "ngu01b0u1eddi mu1edbi",
-      "linked_memory_id": "mem_1777137395"
-    },
-    {
-      "source": "email",
-      "edge": "is",
-      "target": "wedding invitation",
-      "linked_memory_id": "mem_1777138500"
-    },
-    {
-      "source": "email",
-      "edge": "triggers",
-      "target": "schedule event",
-      "linked_memory_id": "mem_1777138500"
     }
   ]
 }
