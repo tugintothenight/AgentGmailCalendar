@@ -36,22 +36,21 @@ class AgentOrchestrator:
                 # ACT
                 act_result = self.act(session, plan["tool_calls"])
                 
-                # Case nhạy cảm bị HITL chặn lại
-                if act_result["status"] == "pending_approval":
-                    return act_result
-                    
-                # REFLECT
-                self.reflect(session, act_result["results"])
-                
-                   # LOOP
+                if "results" in act_result:
+                    self.reflect(session, act_result["results"])
+                else:
+                    error_msg = act_result.get("message", "Lỗi thực thi công cụ.")
+                    print(f"[Orchestrator] Bỏ qua Reflect do lỗi: {error_msg}")
+                    session.add_message("tool", f"HỆ THỐNG TỪ CHỐI THỰC THI: {error_msg}")
                 continue
                 
-        return {"status": "error", "message": "Hệ thống quá tải suy nghĩ (Vượt 5 bước)."}
+        return {"status": "error", "message": f"Hệ thống quá tải suy nghĩ (Vượt {max_steps} bước)."}
 
     # Hàm xử lý các bước  
     def observe(self, session):
         """Thu thập thông tin: Lấy toàn bộ bộ nhớ và lịch sử hiện tại"""
-        return session.get_messages()
+        messages = session.get_messages().copy() 
+        return messages
 
     def think(self, session, context, available_tools):
         """Phân tích và ra quyết định"""
@@ -64,6 +63,11 @@ class AgentOrchestrator:
         
         # Nếu Decide là chạy Tool -> Ép không được nhả Text, tránh trả lời ra json
         if hasattr(message_obj, 'tool_calls') and message_obj.tool_calls:
+            invalid_prompt = self._validate_schedule_event_calls(message_obj.tool_calls)
+            if invalid_prompt:
+                session.add_message("assistant", invalid_prompt)
+                return {"status": "ok", "type": "text_response", "data": invalid_prompt}
+
             message_obj.content = None 
             tool_calls_dict = [{
                 "id": tc.id, 
@@ -86,6 +90,23 @@ class AgentOrchestrator:
                 pass
             session.add_message(message_obj.role, message_obj.content)
             return {"status": "ok", "type": "text_response", "data": llm_result["data"]}
+
+    def _validate_schedule_event_calls(self, tool_calls):
+        for tc in tool_calls:
+            tool_name = tc.function.name
+            if tool_name != "schedule_event":
+                continue
+            try:
+                params = json.loads(tc.function.arguments) if tc.function.arguments else {}
+            except json.JSONDecodeError:
+                return "Thông tin lên lịch chưa hợp lệ. Vui lòng cung cấp `title`, `start_time`, `end_time` theo định dạng ISO 8601, không được bịa đặt bất kỳ giá trị nào."
+            missing = [field for field in ["title", "start_time", "end_time"] if not params.get(field)]
+            if missing:
+                return f"Thiếu thông tin quan trọng để tạo lịch: {', '.join(missing)}. Vui lòng cung cấp đầy đủ `title`, `start_time`, `end_time` trước khi gọi tool lập lịch. Không được tự chế thông tin thiếu."
+            # Kiểm tra định dạng thời gian cơ bản
+            if "T" not in params.get("start_time", "") or "T" not in params.get("end_time", ""):
+                return "Định dạng thời gian chưa đúng. Hãy dùng ISO 8601, ví dụ `2026-04-30T14:00:00`."
+        return None
 
     def act(self, session, tool_calls):
         has_pending_approval = False

@@ -11,10 +11,7 @@ class L4DLPFilter:
             
         system_prompt = """
         You are a STRICT string-replacement script, NOT a conversational AI.
-        Rule 1: Mask phone numbers, emails, and credit cards with "*********".
-        Rule 2: DO NOT answer the user. DO NOT refuse. DO NOT apologize.
-        Rule 3: Output the EXACT SAME text provided, just with sensitive data masked.
-        Rule 4: Do not mask links, addresses, or general names unless they contain clear PII.
+        Rule 1: Mask only phone numbers, credit cards, account balances with "*********".
         If nothing needs masking, output the exact original text.
         """
         try:

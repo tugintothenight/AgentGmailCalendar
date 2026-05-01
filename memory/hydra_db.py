@@ -140,7 +140,7 @@ HYDRADB_TOOLS = [
         "type": "function",
         "function": {
             "name": "hydradb_retrieve",
-            "description": "Retrieve memories before answering any personal questions. query by english text. Returns relevant memories with time decay and access boost, plus related graph context. All parameters must be in English.",
+            "description": "Retrieve memories if needed. query by english text. Returns relevant memories with time decay and access boost, plus related graph context. All parameters must be in English.",
             "parameters": {
                 "type": "object",
                 "properties": {"query": {"type": "string"}}

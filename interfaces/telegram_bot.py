@@ -59,16 +59,41 @@ class TelegramInterface:
             system_instruction = f"""You are Mini-Fang, an elite AI Assistant for Sếp.
 RULES:
 1. Reply in Vietnamese. Call user "Sếp", yourself "em".
-2. You MUST USE TOOLS to accomplish tasks.
+2. You MUST USE TOOLS to accomplish tasks. but DO NOT make user know you are using tools. Always return the final answer in natural language without mentioning tools.
 3. NEVER output raw JSON tool calls in plain text. Use the tool calling mechanism.
-4. Time now: {time_now} ({day_of_week})
-"""       
+4. For `schedule_event`, gather all information needed before calling the tool. Do not invent missing data.
+5. If any required field is missing or not clear, ask the user for missing information before calling `schedule_event`.
+6. Always use hydradb_retrieve at least once per conversation.
+7. Whenever Sếp establishes a procedural rule (e.g., 'Từ giờ...', 'luôn luôn...', 'nếu... thì...') or shares a personal preference, IT IS STRICTLY EXECUTE THE hydradb_store TOOL.
+8. Time now: {time_now} ({day_of_week})
+"""
             self.user_sessions[chat_id] = UserSession(chat_id, system_instruction)
         return self.user_sessions[chat_id]
+
+    # def _extract_info(self, user_input):
+    #     extracted_date = dateparser.parse(
+    #         user_input, 
+    #         languages=['vi', 'en'],
+    #         settings={'PREFER_DATES_FROM': 'future', 'RELATIVE_BASE': datetime.now()}
+    #     )
+        
+    #     return extracted_date
 
     def handle_message(self, message):
         chat_id = str(message.chat.id)
         user_input = message.text
+        # extracted_time = self._extract_info(user_input)
+        # user_input_with_context = ""
+        # if extracted_time:
+        #     time_str = extracted_time.strftime("%Y-%m-%dT%H:%M")
+        #     print(f"[System]: Nhận diện được thời gian: {time_str}")
+                
+        #     context_addition = f"\n(Lưu ý: Thời gian thực hiện tại được xác định là: {time_str})"
+        #     user_input_with_context = user_input + context_addition
+        # else:
+        #     print("[System]: Không nhận diện được thời gian cụ thể, Hãy hỏi lại người dùng.")
+        #     user_input_with_context = user_input
+      
         print(f"\n[User input]: {user_input}")
         
         # L1
@@ -97,7 +122,7 @@ RULES:
         
         system_prompt = session.messages[0]
         recent_messages = session.messages[-keep_recent:] # Giữ nguyên 10 tin mới nhất
-        old_messages = session.messages[1:-keep_recent]   # Móc các tin cũ ra để nén
+        old_messages = session.messages[1:-keep_recent]   # Lấy các tin cũ ra để nén
         
         text_to_summarize = ""
         for m in old_messages:
@@ -151,10 +176,13 @@ RULES:
         result = self.orchestrator.execute_loop(session, AVAILABLE_TOOLS)
         
         if result["status"] == "success":
-            self.bot.edit_message_text(result["message"], chat_id, msg_id)
+            final_text = result.get("message", "")
+            if not final_text or str(final_text).strip() == "":
+                final_text = "Vâng sếp."
+            self.bot.edit_message_text(final_text, chat_id, msg_id)
             
         elif result["status"] == "pending_approval":
-            self.bot.edit_message_text("Cần phê duyệt để đi tiếp:", chat_id, msg_id)
+            self.bot.edit_message_text("Cần phê duyệt để tiếp tục:", chat_id, msg_id)
             pending_tools = result.get("pending_tools", [])
 
             for pt in pending_tools:
@@ -162,6 +190,9 @@ RULES:
                 
         elif result["status"] == "error":
             self.bot.edit_message_text(f"Lỗi Hệ Thống: {result['message']}", chat_id, msg_id)
+        
+        elif result["status"] == "BLOCK":
+            self.bot.edit_message_text(result["message"], chat_id, msg_id)
 
     def _create_approval_request(self, chat_id: str, tool_name: str, parameters: dict, tool_call_id: str):
         """Vẽ nút bấm HITL"""

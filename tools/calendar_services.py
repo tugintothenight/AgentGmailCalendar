@@ -33,15 +33,15 @@ CALENDAR_TOOLS = [
         "type": "function",
         "function": {
             "name": "schedule_event",
-            "description": "Tạo sự kiện trên Google Calendar và mời người tham gia.",
+            "description": "Tạo sự kiện trên Google Calendar.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "title": {"type": "string", "description": "tiêu đề bằng tiếng anh"},
-                    "start_time": {"type": "string", "description": "Thời gian bắt đầu. BẮT BUỘC định dạng ISO 8601 (VD: 2026-08-14T09:00:00)."},
-                    "end_time": {"type": "string", "description": "Thời gian kết thúc. BẮT BUỘC định dạng ISO 8601 (VD: 2026-08-14T12:00:00)."}
+                    "start_time": {"type": "string", "description": "Thời gian bắt đầu, không được tự đoán mò. BẮT BUỘC định dạng ISO 8601 (VD: 2026-08-14T09:00:00)."},
+                    "end_time": {"type": "string", "description": "Thời gian kết thúc, không được tự đoán mò. BẮT BUỘC định dạng ISO 8601 (VD: 2026-08-14T12:00:00)."}
                 },
-                "required": ["title", "start_time", "end_time"]
+                "required": ["title"]
             }
         }
     }

@@ -20,16 +20,15 @@ class L3CircuitBreaker:
         self.history_actions.append(current_action)
         
         if len(self.history_actions) >= 2:
-            recent = self.history_actions[-self.max_duplicates:]
-            # Nếu gọi lại tool y hệt 2 lần liên tiếp -> Cảnh cáo
-            if len(recent) >= 2 and len(set(self.history_actions[-2:])) == 1:
-                print(f"[Security L3] AI lặp lại hành động: {current_action}")
-                return {"status": "WARNING", "message": "Mày vừa gọi tool này rồi. Đổi cách đi!"}
+            recent = self.history_actions[-self.max_duplicates:]            
             # Nếu gọi liên tục max_duplicates lần -> Ngắt luồng
             if len(recent) == self.max_duplicates and len(set(recent)) == 1:
                 print(f"[Security L3] AI kẹt vòng lặp -> buộc dừng!")
                 return {"status": "BLOCK", "message": "HARD_STOP: Infinite loop detected."}
-                
+            # Nếu gọi lại tool y hệt 2 lần liên tiếp -> Cảnh cáo
+            if len(recent) >= 2 and len(set(self.history_actions[-2:])) == 1:
+                print(f"[Security L3] AI lặp lại hành động: {current_action}")
+                return {"status": "WARNING", "message": "Mày vừa gọi tool này rồi. Đổi cách đi!"}    
         return {"status": "PASS"}
 
     def reset(self):

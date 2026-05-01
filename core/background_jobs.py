@@ -37,9 +37,10 @@ class BackgroundJobManager:
         1. Check the latest emails, Determine whether it is an important email, an advertisement, or spam.
         if there is anything important, summarize the report. 
         If email content NEED schedule and just ONLY email content NEED schedule, add text below your answer 
-        with <b></b> tag to ask sếp to allow scheduling.
-        2. Always report in Vietnamese. 
-        3. If there is nothing, say exactly 'none'."""
+        with <b></b> tag to ask sếp to allow scheduling. DO NOT add scheduling suggestion if the email does not require scheduling.
+        2. Use hydradb_retrieve after checking emails.
+        3. Always report in Vietnamese. 
+        4. If there is nothing, say exactly 'none'."""
         session = UserSession(chat_id, system_prompt)
         session.add_message("user", "Kiểm tra 1 email mới nhất của tôi.")
 
@@ -50,8 +51,8 @@ class BackgroundJobManager:
                 report = re.sub(r'<([^<>]+@[^<>]+)>', r'&lt;\1&gt;', report) # lọc email để tránh nhận <email> thành tag trong html
                 
                 if "none" not in report.strip().lower():
-                    if any(kw in report.lower() for kw in ["meeting", "họp", "gặp mặt", "deadline"]):
-                        report += '\n\n<b>Sếp có muốn em đặt lịch giúp theo email này không?</b>'
+                    # if any(kw in report.lower() for kw in ["meeting", "họp", "gặp mặt", "deadline"]):
+                    #     report += '\n\n<b>Sếp có muốn em đặt lịch giúp theo email này không?</b>'
                     final_msg = f"**[Email mới]**\n\n{report}"
                     self.bot_interface.bot.send_message(chat_id, final_msg, parse_mode="HTML")
                     main_session = self.bot_interface._get_or_create_session(chat_id)
